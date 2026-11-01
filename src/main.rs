@@ -15,10 +15,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let (mut socket, _) = listener.accept().await?;
 
         tokio::spawn(async move {
+
             let mut buf: [u8; 1024] = [0; 1024];
 
             loop {
-                let n: usize = match socket.read(&mut buf).await {
+                let raw_socket: usize = match socket.read(&mut buf).await {
                     Ok(0) => return,
                     Ok(n) => n,
                     Err(e) => {
@@ -27,12 +28,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 };
 
-                let d = String::from_utf8_lossy(&buf[..n]);
-                println!("{} {:?}", n, d);
+                let request = String::from_utf8_lossy(&buf[..raw_socket]);
+                println!("{} {:?}", raw_socket, request);
 
-                match d.to_lowercase().as_str() {
+                match request.to_lowercase().as_str() {
                     "*1\r\n$4\r\nping\r\n" => ping(&mut socket).await,
-                    "set" => data_set(&mut socket).await,
+                    "*1\r\n$3\r\nset\r\n" => data_set(&mut socket).await,
                     _ => {
                         if let Err(e) = socket.write_all(b"-ERRunknown command\r\n").await {
                             eprintln!("failed to write to socket; err = {:?}", e);
