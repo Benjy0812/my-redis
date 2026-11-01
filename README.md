@@ -1,11 +1,11 @@
 # My-Redis
 
-# Curent features
+## Curent features
 - Ping responds with PONG
 
-# Features to add
+## Features to add
 - Set
 - Get
 - Etc
 
-Made by me in Nvim so slow :(
+> Made by me in Nvim so slow :(
